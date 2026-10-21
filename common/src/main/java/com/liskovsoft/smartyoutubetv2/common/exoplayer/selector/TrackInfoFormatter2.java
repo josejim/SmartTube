@@ -13,7 +13,6 @@ public class TrackInfoFormatter2 {
     private String mHighBitrateStr;
     private boolean mEnableBitrate;
     private String mDrcStr;
-    private String mVbStr;
 
     public void setFormat(Format format) {
         if (TrackSelectorUtil.isVideo(format)) {
@@ -54,7 +53,6 @@ public class TrackInfoFormatter2 {
         mChannelsStr = TrackSelectorUtil.buildChannels(format);
 
         mDrcStr = TrackSelectorUtil.buildDrcMark(format);
-        mVbStr = TrackSelectorUtil.buildVbMark(format);
     }
 
     public void setSpeed(float speed) {
@@ -62,7 +60,7 @@ public class TrackInfoFormatter2 {
     }
 
     public String getQualityLabel() {
-        return combine(mResolutionStr, mFpsStr, mCodecStr, mBitrateStr, mHdrStr, mChannelsStr, mSpeedStr, mHighBitrateStr, mDrcStr, mVbStr);
+        return combine(mResolutionStr, mFpsStr, mCodecStr, mBitrateStr, mHdrStr, mChannelsStr, mSpeedStr, mHighBitrateStr, mDrcStr);
     }
 
     private static String combine(String... items) {

@@ -37,7 +37,6 @@ public class ExoFormatItem implements FormatItem {
     private String mFormatId;
     private boolean mIsPreset;
     private boolean mIsDrc;
-    private boolean mIsVb;
 
     public static List<FormatItem> from(Set<MediaTrack> mediaTracks) {
         if (mediaTracks == null) {
@@ -94,7 +93,6 @@ public class ExoFormatItem implements FormatItem {
                 formatItem.mId = format.id.hashCode();
                 formatItem.mFormatId = format.id;
                 formatItem.mIsDrc = format.isDrc;
-                formatItem.mIsVb = TrackSelectorUtil.isVb(format);
             }
         } else {
             formatItem.mIsDefault = true; // fake auto track
@@ -122,7 +120,6 @@ public class ExoFormatItem implements FormatItem {
         boolean isPreset = false;
         int bitrate = -1;
         boolean isDrc = false;
-        boolean isVb = false;
 
         if (mTrack != null) {
             rendererIndex = mTrack.rendererIndex;
@@ -137,11 +134,10 @@ public class ExoFormatItem implements FormatItem {
                 language = format.language;
                 bitrate = format.bitrate;
                 isDrc = format.isDrc;
-                isVb = TrackSelectorUtil.isVb(format);
             }
         }
 
-        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s", mType, rendererIndex, id, codecs, width, height, frameRate, language, isPreset, bitrate, isDrc, isVb);
+        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s", mType, rendererIndex, id, codecs, width, height, frameRate, language, isPreset, bitrate, isDrc);
     }
 
     @Override
@@ -156,7 +152,6 @@ public class ExoFormatItem implements FormatItem {
                     if (mFormatId != null && formatItem.mFormatId != null) {
                         return mType == formatItem.mType
                                 && mIsDrc == formatItem.mIsDrc                      // drc audio
-                                && mIsVb == formatItem.mIsVb                        // voice boost audio
                                 && Helpers.contains(SubtitleTrack.trim(mLanguage),  // dubbed audio
                                     SubtitleTrack.trim(formatItem.mLanguage))
                                 && Helpers.equals(mFormatId, formatItem.mFormatId); // instead of compare by bitrate
@@ -164,7 +159,6 @@ public class ExoFormatItem implements FormatItem {
                     return mIsPreset == formatItem.mIsPreset
                             && mType == formatItem.mType
                             && mIsDrc == formatItem.mIsDrc
-                            && mIsVb == formatItem.mIsVb
                             && mFrameRate == formatItem.mFrameRate
                             && mWidth == formatItem.mWidth
                             && mHeight == formatItem.mHeight
@@ -182,12 +176,6 @@ public class ExoFormatItem implements FormatItem {
     public static ExoFormatItem from(int type, int rendererIndex, String id, String codecs,
                                      int width, int height, float frameRate, String language,
                                      boolean isPreset, int bitrate, boolean isDrc) {
-        return from(type, rendererIndex, id, codecs, width, height, frameRate, language, isPreset, bitrate, isDrc, false);
-    }
-
-    public static ExoFormatItem from(int type, int rendererIndex, String id, String codecs,
-                                     int width, int height, float frameRate, String language,
-                                     boolean isPreset, int bitrate, boolean isDrc, boolean isVb) {
         MediaTrack mediaTrack = MediaTrack.forRendererIndex(rendererIndex);
 
         if (mediaTrack == null) {
@@ -212,9 +200,6 @@ public class ExoFormatItem implements FormatItem {
                 mediaTrack.format = Format.createAudioSampleFormat(
                         id, null, codecs, bitrate, -1,0, 0,
                         null, null, 0, language, isDrc);
-                if (isVb) {
-                    mediaTrack.format = TrackSelectorUtil.markVb(mediaTrack.format);
-                }
                 break;
             case TYPE_SUBTITLE:
                 mediaTrack.format = Format.createTextSampleFormat(
@@ -238,11 +223,7 @@ public class ExoFormatItem implements FormatItem {
             split = Helpers.appendArray(split, new String[]{"false"});
         }
 
-        if (split.length == 11) {
-            split = Helpers.appendArray(split, new String[]{"false"}); // isVb
-        }
-
-        if (split.length != 12) {
+        if (split.length != 11) {
             return null;
         }
 
@@ -257,9 +238,8 @@ public class ExoFormatItem implements FormatItem {
         boolean isPreset = Helpers.parseBoolean(split[8]);
         int bitrate = Helpers.parseInt(split[9]);
         boolean isDrc = Helpers.parseBoolean(split[10]);
-        boolean isVb = Helpers.parseBoolean(split[11]);
 
-        return from(type, rendererIndex, id, codecs, width, height, frameRate, language, isPreset, bitrate, isDrc, isVb);
+        return from(type, rendererIndex, id, codecs, width, height, frameRate, language, isPreset, bitrate, isDrc);
     }
 
     /**
