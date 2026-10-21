@@ -1,0 +1,44 @@
+# SmartTube Build Environment
+# JDK 17 + Android SDK + Gradle
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV ANDROID_SDK_ROOT=/opt/android-sdk
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+
+# Install base tools + JDK
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget \
+    unzip \
+    git \
+    curl \
+    openjdk-17-jdk \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download and setup Android SDK
+RUN mkdir -p $ANDROID_SDK_ROOT/cmdline-tools && \
+    cd $ANDROID_SDK_ROOT/cmdline-tools && \
+    wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip && \
+    unzip -q cmdline-tools.zip && \
+    mv cmdline-tools latest && \
+    rm cmdline-tools.zip
+
+# Set PATH for sdkmanager
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+# Accept licenses and install required SDK components
+RUN yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses || true
+RUN $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --install \
+    "platforms;android-34" \
+    "build-tools;34.0.0" \
+    "platform-tools"
+
+# Copy project (expecting this Dockerfile to be at project root)
+COPY . /project
+WORKDIR /project
+
+# Make gradlew executable
+RUN chmod +x gradlew
+
+# Default: compile the ststable variant
+CMD ["./gradlew", ":common:compileStstableDebugJavaWithJavac", "--no-daemon"]
