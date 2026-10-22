@@ -26,12 +26,15 @@ jobs:
       - name: Grant Gradle permissions
         run: chmod +x gradlew
 
-      - name: Build debug APK
-        run: ./gradlew :smarttubetv:assembleStbetaDebug --no-daemon
+      # stdev = org.smarttube.dev, so it can be installed next to the official app
+      - name: Build dev debug APK
+        run: ./gradlew :smarttubetv:assembleStdevDebug --no-daemon
 
-      - name: Upload debug APK
+      - name: Upload dev APK
         uses: actions/upload-artifact@v4
         with:
-          name: debug-apk
-          path: smarttubetv/build/outputs/apk/stbeta/debug/*.apk
+          name: debug-apk-stdev
+          path: |
+            smarttubetv/build/outputs/apk/stdev/debug/*.apk
+            smarttubetv/build/outputs/apk/stdev/debug/output-metadata.json
           if-no-files-found: error

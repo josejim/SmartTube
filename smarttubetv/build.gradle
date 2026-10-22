@@ -177,6 +177,11 @@ android {
                 abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86'
             }
         }
+        // Fork-only: lets the dev build live next to the official app
+        stdev {
+            applicationId "org.smarttube.dev"
+            targetSdkVersion project.properties.compileSdkVersion
+        }
     }
 }
 
