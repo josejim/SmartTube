@@ -3,13 +3,11 @@ package com.liskovsoft.smartyoutubetv2.common.app.presenters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
-import com.liskovsoft.mediaserviceinterfaces.SignInService;
 import com.liskovsoft.mediaserviceinterfaces.oauth.Account;
 import com.liskovsoft.smartyoutubetv2.common.app.presenters.base.BasePresenter;
 import com.liskovsoft.smartyoutubetv2.common.app.presenters.dialogs.AccountSelectionPresenter;
 import com.liskovsoft.smartyoutubetv2.common.app.views.ProfilePickerView;
 import com.liskovsoft.smartyoutubetv2.common.app.views.ViewManager;
-import com.liskovsoft.youtubeapi.service.YouTubeServiceManager;
 
 import java.util.Collections;
 import java.util.List;
@@ -65,9 +63,5 @@ public class ProfilePickerPresenter extends BasePresenter<ProfilePickerView> {
     public void onViewDestroyed() {
         super.onViewDestroyed();
         unhold();
-    }
-
-    private SignInService getSignInService() {
-        return YouTubeServiceManager.instance().getSignInService();
     }
 }
