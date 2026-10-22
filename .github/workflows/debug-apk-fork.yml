@@ -26,15 +26,16 @@ jobs:
       - name: Grant Gradle permissions
         run: chmod +x gradlew
 
-      # stdev = org.smarttube.dev, so it can be installed next to the official app
+      # debug builds carry applicationIdSuffix ".dev" -> org.smarttube.beta.dev,
+      # so they install next to the official app.
       - name: Build dev debug APK
-        run: ./gradlew :smarttubetv:assembleStdevDebug --no-daemon
+        run: ./gradlew :smarttubetv:assembleStbetaDebug --no-daemon
 
       - name: Upload dev APK
         uses: actions/upload-artifact@v4
         with:
-          name: debug-apk-stdev
+          name: debug-apk-dev
           path: |
-            smarttubetv/build/outputs/apk/stdev/debug/*.apk
-            smarttubetv/build/outputs/apk/stdev/debug/output-metadata.json
+            smarttubetv/build/outputs/apk/stbeta/debug/*.apk
+            smarttubetv/build/outputs/apk/stbeta/debug/output-metadata.json
           if-no-files-found: error

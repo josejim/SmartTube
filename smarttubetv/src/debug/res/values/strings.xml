@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Fork-only: debug builds show up as a separate app -->
     <string translatable="false" name="app_name"><![CDATA[SmartTube dev]]></string>
     <string translatable="false" name="browse_title"><![CDATA[SmartTube dev]]></string>
 </resources>

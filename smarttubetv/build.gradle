@@ -113,6 +113,10 @@ android {
         }
         // Use same key for release and debug for testing
         debug {
+            // Fork-only: debug builds get their own package id so they can live
+            // next to the official app (org.smarttube.beta.dev)
+            applicationIdSuffix ".dev"
+
             if (keystorePropertiesFile.exists()) {
                 signingConfig signingConfigs.release
             }
@@ -176,11 +180,6 @@ android {
             ndk {
                 abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86'
             }
-        }
-        // Fork-only: lets the dev build live next to the official app
-        stdev {
-            applicationId "org.smarttube.dev"
-            targetSdkVersion project.properties.compileSdkVersion
         }
     }
 }

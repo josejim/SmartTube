@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Dev build: no update manifest, so the app never offers the official beta -->
-    <string-array name="update_urls" />
-</resources>
