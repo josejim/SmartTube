@@ -15,11 +15,13 @@ import com.liskovsoft.smartyoutubetv2.common.app.models.data.Video;
 import com.liskovsoft.smartyoutubetv2.common.app.models.playback.ui.UiOptionItem;
 import com.liskovsoft.smartyoutubetv2.common.app.presenters.AppDialogPresenter;
 import com.liskovsoft.smartyoutubetv2.common.app.presenters.BrowsePresenter;
+import com.liskovsoft.smartyoutubetv2.common.app.presenters.ProfilePickerPresenter;
 import com.liskovsoft.smartyoutubetv2.common.app.presenters.base.BasePresenter;
 import com.liskovsoft.smartyoutubetv2.common.app.presenters.dialogs.AccountSelectionPresenter;
 import com.liskovsoft.smartyoutubetv2.common.app.presenters.dialogs.AppUpdatePresenter;
 import com.liskovsoft.smartyoutubetv2.common.app.presenters.dialogs.menu.VideoMenuPresenter.VideoMenuCallback;
 import com.liskovsoft.smartyoutubetv2.common.misc.MediaServiceManager;
+import com.liskovsoft.smartyoutubetv2.common.prefs.AccountsData;
 import com.liskovsoft.smartyoutubetv2.common.prefs.GeneralData;
 import com.liskovsoft.smartyoutubetv2.common.prefs.MainUIData;
 import com.liskovsoft.smartyoutubetv2.common.utils.AppDialogUtil;
@@ -181,7 +183,13 @@ public abstract class BaseMenuPresenter extends BasePresenter<Void> {
         getDialogPresenter().appendSingleButton(
                 UiOptionItem.from(
                         getContext().getString(R.string.dialog_account_list),
-                        optionItem -> AccountSelectionPresenter.instance(getContext()).show(true)
+                        optionItem -> {
+                            if (AccountsData.instance(getContext()).getProfilePickerMode() == AccountsData.PICKER_GRID) {
+                                ProfilePickerPresenter.instance(getContext()).show();
+                            } else {
+                                AccountSelectionPresenter.instance(getContext()).show(true);
+                            }
+                        }
                 ));
     }
 

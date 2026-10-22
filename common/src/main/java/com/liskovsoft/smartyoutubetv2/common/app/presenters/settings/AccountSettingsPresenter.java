@@ -71,6 +71,7 @@ public class AccountSettingsPresenter extends BasePresenter<Void> {
         appendProtectAccountWithPassword(settingsPresenter);
         appendSeparateSettings(settingsPresenter);
         appendSelectAccountOnBoot(settingsPresenter);
+        appendProfilePickerMode(settingsPresenter);
 
         Account account = getSignInService().getSelectedAccount();
         int accountIndex = accounts != null ? accounts.indexOf(account) : -1;
@@ -151,6 +152,28 @@ public class AccountSettingsPresenter extends BasePresenter<Void> {
         settingsPresenter.appendSingleSwitch(UiOptionItem.from(getContext().getString(R.string.select_account_on_boot), optionItem -> {
             AccountsData.instance(getContext()).selectAccountOnBoot(optionItem.isSelected());
         }, AccountsData.instance(getContext()).isSelectAccountOnBootEnabled()));
+    }
+
+    private void appendProfilePickerMode(AppDialogPresenter settingsPresenter) {
+        List<OptionItem> optionItems = new ArrayList<>();
+
+        optionItems.add(UiOptionItem.from(
+                getContext().getString(R.string.profile_picker_mode_grid),
+                optionItem -> {
+                    AccountsData.instance(getContext()).setProfilePickerMode(AccountsData.PICKER_GRID);
+                    settingsPresenter.closeDialog();
+                },
+                AccountsData.instance(getContext()).getProfilePickerMode() == AccountsData.PICKER_GRID));
+
+        optionItems.add(UiOptionItem.from(
+                getContext().getString(R.string.profile_picker_mode_dialog),
+                optionItem -> {
+                    AccountsData.instance(getContext()).setProfilePickerMode(AccountsData.PICKER_DIALOG);
+                    settingsPresenter.closeDialog();
+                },
+                AccountsData.instance(getContext()).getProfilePickerMode() == AccountsData.PICKER_DIALOG));
+
+        settingsPresenter.appendStringsCategory(getContext().getString(R.string.profile_picker_mode), optionItems);
     }
 
     private void appendProtectAccountWithPassword(AppDialogPresenter settingsPresenter) {

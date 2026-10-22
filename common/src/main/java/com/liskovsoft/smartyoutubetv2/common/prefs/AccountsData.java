@@ -71,6 +71,18 @@ public class AccountsData implements AccountChangeListener {
         return mIsSelectAccountOnBootEnabled;
     }
 
+    /** Profile picker styles. */
+    public static final int PICKER_DIALOG = 0;
+    public static final int PICKER_GRID = 1;
+
+    public void setProfilePickerMode(int mode) {
+        mAppPrefs.putInt("profile_picker_mode", mode);
+    }
+
+    public int getProfilePickerMode() {
+        return mAppPrefs.getInt("profile_picker_mode", PICKER_GRID);
+    }
+
     public void setAccountPassword(String password) {
         mPasswords.put(getAccountName(), new PasswordItem(getAccountName(), password));
 
