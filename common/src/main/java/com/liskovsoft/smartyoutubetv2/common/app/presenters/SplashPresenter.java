@@ -123,6 +123,14 @@ public class SplashPresenter extends BasePresenter<SplashView> {
     }
 
     private void showAccountSelectionIfNeeded() {
+        AccountsData data = AccountsData.instance(getContext());
+        ProfilePickerPresenter picker = ProfilePickerPresenter.instance(getContext());
+
+        if (data.getProfilePickerMode() == AccountsData.PICKER_GRID && picker.getAccounts().size() > 1) {
+            picker.show();
+            return;
+        }
+
         AccountSelectionPresenter.instance(getContext()).show();
     }
 
