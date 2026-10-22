@@ -101,6 +101,10 @@
     <string name="show_again">Show again</string>
     <string name="check_updates_auto">Notify about updates</string>
     <string name="select_account_on_boot">Show account selection on boot</string>
+    <string name="profile_picker_title">Who\'s watching?</string>
+    <string name="profile_picker_mode">Profile picker style</string>
+    <string name="profile_picker_mode_grid">Full-screen grid</string>
+    <string name="profile_picker_mode_dialog">Dialog list</string>
     <string name="player_other">Misc</string>
     <string name="player_full_date">Precise date in description</string>
     <string name="open_channel">Open channel</string>
