@@ -3,6 +3,7 @@ package com.liskovsoft.smartyoutubetv2.tv.ui.profiles;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 import androidx.leanback.app.VerticalGridSupportFragment;
@@ -137,14 +138,16 @@ public class ProfilePickerFragment extends VerticalGridSupportFragment implement
      * 720p / 1080p panels and looked broken next to the title.
      */
     private void applyVerticalPadding() {
-        VerticalGridView grid = getGridView();
+        View root = getView();
 
-        if (grid == null) {
+        if (root == null) {
             return;
         }
 
-        grid.post(() -> {
-            if (grid.getChildCount() == 0) {
+        root.post(() -> {
+            VerticalGridView grid = findGrid(root);
+
+            if (grid == null || grid.getChildCount() == 0) {
                 return;
             }
 
@@ -161,6 +164,27 @@ public class ProfilePickerFragment extends VerticalGridSupportFragment implement
 
             grid.setPadding(0, pad, 0, 0);
         });
+    }
+
+    /** The fragment does not expose its grid, so walk the view tree once. */
+    private VerticalGridView findGrid(View view) {
+        if (view instanceof VerticalGridView) {
+            return (VerticalGridView) view;
+        }
+
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+
+            for (int i = 0; i < group.getChildCount(); i++) {
+                VerticalGridView result = findGrid(group.getChildAt(i));
+
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+
+        return null;
     }
 
     private void selectAccount(Account account) {
