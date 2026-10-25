@@ -5,10 +5,16 @@ on:
   push:
     branches-ignore:
       - master
+      - updates
+
+permissions:
+  contents: write
 
 jobs:
   debug-apk:
     runs-on: ubuntu-latest
+    env:
+      HAS_SIGNING_KEY: ${{ secrets.SIGNING_KEY != '' }}
 
     steps:
       - name: Checkout Code
@@ -26,10 +32,47 @@ jobs:
       - name: Grant Gradle permissions
         run: chmod +x gradlew
 
-      # debug builds carry applicationIdSuffix ".dev" -> org.smarttube.beta.dev,
-      # so they install next to the official app.
+      # Stable keystore: without it every build has a different signature and
+      # the app can never install over the previous one (and updates are dead).
+      - name: Configure stable signing
+        if: ${{ env.HAS_SIGNING_KEY == 'true' }}
+        run: |
+          echo "storePassword=${{ secrets.KEY_STORE_PASSWORD }}" > keystore.properties
+          echo "keyAlias=${{ secrets.ALIAS }}" >> keystore.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> keystore.properties
+          echo "storeFile=${{ github.workspace }}/key.jks" >> keystore.properties
+          echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > ${{ github.workspace }}/key.jks
+
+      # versionCode must grow or the updater will never see a new build.
+      - name: Bump version code
+        run: |
+          BASE=$(grep -oP 'versionCode \K[0-9]+' smarttubetv/build.gradle | head -1)
+          NEW=$((BASE + ${{ github.run_number }}))
+          sed -i "s/versionCode $BASE/versionCode $NEW/" smarttubetv/build.gradle
+          NAME=$(grep -oP 'versionName "\K[^"]+' smarttubetv/build.gradle | head -1)
+          echo "VERSION_CODE=$NEW" >> $GITHUB_ENV
+          echo "VERSION_NAME=$NAME" >> $GITHUB_ENV
+          echo "building $NAME ($NEW)"
+
       - name: Build dev debug APK
         run: ./gradlew :smarttubetv:assembleStbetaDebug --no-daemon
+
+      - name: Generate update manifest
+        run: |
+          cat > dev.json <<EOF
+          {
+            "package": {
+              "downloadUrlList": ["https://github.com/josejim/SmartTube/releases/download/picker-dev/smarttube_dev_armeabi-v7a.apk"],
+              "downloadUrlList_arm64-v8a": ["https://github.com/josejim/SmartTube/releases/download/picker-dev/smarttube_dev_arm64-v8a.apk"],
+              "downloadUrlList_x86": ["https://github.com/josejim/SmartTube/releases/download/picker-dev/smarttube_dev_x86.apk"]
+            },
+            "$VERSION_NAME": {
+              "versionCode": $VERSION_CODE,
+              "changelog": ["Profile picker: long-press opens it, measured centering, DEV icon"]
+            }
+          }
+          EOF
+          cat dev.json
 
       - name: Upload dev APK
         uses: actions/upload-artifact@v4
@@ -38,4 +81,5 @@ jobs:
           path: |
             smarttubetv/build/outputs/apk/stbeta/debug/*.apk
             smarttubetv/build/outputs/apk/stbeta/debug/output-metadata.json
+            dev.json
           if-no-files-found: error

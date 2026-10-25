@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fork-only: debug builds check updates against OUR release manifest, not upstream's.
+         Served from the `updates` branch so the URL never changes between releases. -->
+    <string-array name="update_urls">
+        <item>https://raw.githubusercontent.com/josejim/SmartTube/updates/dev.json</item>
+    </string-array>
+</resources>
