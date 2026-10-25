@@ -205,6 +205,7 @@
                   android:theme="@style/App.Theme.Leanback.GuidedStep"/>
 
         <activity android:name="com.liskovsoft.smartyoutubetv2.tv.ui.profiles.ProfilePickerActivity"
+                  android:exported="true"
                   android:launchMode="singleInstance"
                   android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection"
                   android:screenOrientation="unspecified"
