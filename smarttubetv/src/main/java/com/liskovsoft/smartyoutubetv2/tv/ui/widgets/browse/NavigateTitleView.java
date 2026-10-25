@@ -22,6 +22,8 @@ import com.liskovsoft.mediaserviceinterfaces.oauth.Account;
 import com.liskovsoft.sharedutils.locale.LocaleUtility;
 import com.liskovsoft.smartyoutubetv2.common.app.models.data.Video;
 import com.liskovsoft.smartyoutubetv2.common.app.presenters.PlaybackPresenter;
+import com.liskovsoft.smartyoutubetv2.common.app.presenters.ProfilePickerPresenter;
+import com.liskovsoft.smartyoutubetv2.common.prefs.AccountsData;
 import com.liskovsoft.smartyoutubetv2.common.app.presenters.dialogs.AccountSelectionPresenter;
 import com.liskovsoft.smartyoutubetv2.common.app.presenters.settings.AccountSettingsPresenter;
 import com.liskovsoft.smartyoutubetv2.common.app.presenters.settings.LanguageSettingsPresenter;
@@ -197,7 +199,12 @@ public class NavigateTitleView extends TitleView implements OnDataChange, Accoun
         mAccountView = findViewById(R.id.account_orb);
         mAccountView.setOnOrbClickedListener(v -> AccountSelectionPresenter.instance(getContext()).nextAccountOrDialog());
         mAccountView.setOnOrbLongClickedListener(v -> {
-            AccountSettingsPresenter.instance(getContext()).show();
+            // Grid mode: long press opens the profile picker every time (not only on boot).
+            if (AccountsData.instance(getContext()).getProfilePickerMode() == AccountsData.PICKER_GRID) {
+                ProfilePickerPresenter.instance(getContext()).show();
+            } else {
+                AccountSettingsPresenter.instance(getContext()).show();
+            }
             return true;
         });
         TooltipCompatHandler.setTooltipText(mAccountView, getContext().getString(R.string.settings_accounts));

@@ -14,6 +14,7 @@ import androidx.leanback.widget.Presenter;
 import androidx.leanback.widget.Row;
 import androidx.leanback.widget.RowPresenter;
 import androidx.leanback.widget.VerticalGridPresenter;
+import androidx.leanback.widget.VerticalGridView;
 
 import com.liskovsoft.mediaserviceinterfaces.oauth.Account;
 import com.liskovsoft.sharedutils.helpers.Helpers;
@@ -34,8 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProfilePickerFragment extends VerticalGridSupportFragment implements ProfilePickerView {
-    private static final int ROW_HEIGHT_DP = 300;
-
     private final ClassPresenterSelector mSelector = new ClassPresenterSelector()
             .addClassPresenter(ProfileItem.class, new ProfileCardPresenter())
             .addClassPresenter(ProfileAction.class, new ProfileActionPresenter());
@@ -71,7 +70,6 @@ public class ProfilePickerFragment extends VerticalGridSupportFragment implement
 
         loadProfiles();
     }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -112,7 +110,7 @@ public class ProfilePickerFragment extends VerticalGridSupportFragment implement
                     mAdapter.add(new ProfileAction(ProfileAction.ADD, getString(R.string.dialog_add_account)));
                     mAdapter.add(new ProfileAction(ProfileAction.REMOVE, getString(R.string.dialog_remove_account)));
 
-                    applyVerticalPadding(items.size());
+                    applyVerticalPadding();
                     focusSelectedAccount(accounts);
                 });
     }
@@ -133,19 +131,36 @@ public class ProfilePickerFragment extends VerticalGridSupportFragment implement
         }
     }
 
-    private void applyVerticalPadding(int count) {
-        View view = getView();
+    /**
+     * Center the grid vertically using the REAL measured row height instead of a hardcoded
+     * card size. The old version assumed 300dp rows, which pushed the grid off-center on
+     * 720p / 1080p panels and looked broken next to the title.
+     */
+    private void applyVerticalPadding() {
+        VerticalGridView grid = getGridView();
 
-        if (view == null) {
+        if (grid == null) {
             return;
         }
 
-        int density = (int) getResources().getDisplayMetrics().density;
-        int rows = ProfileGridLayout.rowsFor(count);
-        int rowPx = ROW_HEIGHT_DP * density;
-        int screenPx = getResources().getDisplayMetrics().heightPixels;
+        grid.post(() -> {
+            if (grid.getChildCount() == 0) {
+                return;
+            }
 
-        view.setPadding(0, ProfileGridLayout.topPaddingPx(rows, rowPx, 0, screenPx), 0, 0);
+            int rowHeight = grid.getChildAt(0).getHeight();
+
+            if (rowHeight <= 0) {
+                return;
+            }
+
+            int total = mAdapter.size();
+            int rows = Math.min(ProfileGridLayout.MAX_ROWS,
+                    (total + ProfileGridLayout.COLUMNS - 1) / ProfileGridLayout.COLUMNS);
+            int pad = Math.max(0, (grid.getHeight() - rows * rowHeight) / 2);
+
+            grid.setPadding(0, pad, 0, 0);
+        });
     }
 
     private void selectAccount(Account account) {
